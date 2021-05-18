@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+import sys
+
+months = {
+
+    1: 31,
+    2: 28,
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30,
+    7: 31,
+    8: 31,
+    9: 30, 
+    10: 31,
+    11: 30,
+    12: 31
+}
+
+
+def is_leap_year(year):
+
+    if (( year % 400 == 0) or (( year % 4 == 0 ) and ( year % 100 != 0))):
+        return True
+    else:
+        return False
+
+def input_date(name):
+
+    date = input ('Please enter {} date in following format dd/mm/yyyy :'.format(name))    
+
+    day, month, year = date.split('/')
+    
+    try:
+        mm = int(month)
+        dd = int(day)
+        yyyy = int(year)
+        assert 1 <= dd <= months.get(mm),  "The dd date is out of range"
+        assert 1 <= mm <= 12, "The mm date is out of range"
+        assert 1901 <= yyyy <= 2999, "The yyyy date is out of range"
+
+    except AssertionError as e:
+
+            print(e)
+            sys.exit(1)
+
+    except TypeError:
+            print('Error: One of the dates was not in format dd/mm/yyyy: Date provided was {}'.format(date))
+            sys.exit(1)
+    except ValueError:
+            print('Error: One of the dates was not in format dd/mm/yyyy: Date provided was {}'.format(date))
+            sys.exit(1)
+
+    else:
+
+        return dd, mm, yyyy
+
+
+def main():
+    
+    total_days = 0
+
+    f_day, f_month, f_year = input_date('first')
+
+    s_day, s_month, s_year = input_date('second')
+
+    # basically allowing for someone to set start and end date 
+    if f_year > s_year:
+
+        upper_dd, upper_mm, upper_yy = f_day, f_month, f_year
+        low_dd, low_mm, low_yy = s_day, s_month, s_year
+ 
+    if f_year < s_year:
+        
+        upper_dd, upper_mm, upper_yy = s_day, s_month, s_year
+        low_dd, low_mm, low_yy = f_day, f_month, f_year
+
+    if f_year == s_year:
+
+        if f_month > s_month:
+
+            upper_dd, upper_mm, upper_yy = f_day, f_month, False
+            low_dd, low_mm, low_yy = s_day, s_month, False
+
+        elif f_month < s_month:
+
+            upper_dd, upper_mm, upper_yy = s_day, s_month, False
+            low_dd, low_mm, low_yy = f_day, f_month, False
+
+        elif f_month == s_month:  
+
+            upper_dd, upper_mm, upper_yy = s_day, False, False
+            low_dd, low_mm, low_yy = f_day, False, False
+            
+            month_equal = f_month
+        
+        year_equal = f_year
+    
+    if low_yy:
+        
+        days_in_month = months.get(low_mm) - low_dd
+        total_days = total_days + days_in_month
+        
+        if low_mm != 12:
+            
+            start_month = low_mm + 1
+
+            days_left = 0
+
+            for i in range(start_month, 13):
+
+                day = months.get(i)
+
+                if i == 2 and is_leap_year(low_yy):
+                    day = 29
+
+                days_left = days_left + day
+
+            total_days = total_days + days_left
+    
+    if upper_yy:
+
+        total_days = total_days + (upper_dd -1)
+
+        if upper_mm > 1:
+
+            start_month = upper_mm -1 
+
+            days_left = 0
+
+            for i in range(start_month, 0, -1):
+                
+                day = months.get(i)
+            
+                if i == 2 and is_leap_year(low_yy):
+                    day = 29
+
+                days_left = days_left + day
+            total_days = total_days + days_left
+
+    else:
+
+        if upper_mm and low_mm:
+
+            end_month = low_mm
+            days_lower = 0
+            for i in range(1, end_month):
+
+                day = months.get(i)
+
+                if i == 2 and is_leap_year(year_equal):
+                    day = 29
+
+                days_lower = days_lower + day
+
+            days_lower = days_lower + low_dd
+
+            days_higher = 0
+            higher_month = upper_mm
+            for i in range(1, higher_month):
+
+                u_day = months.get(i)
+
+                if i == 2 and is_leap_year(year_equal):
+                    u_day = 29
+
+                days_higher = days_higher + u_day
+            
+            days_higher = days_higher + upper_dd
+
+            total_days = (days_higher - days_lower) -1
+
+
+        else:
+           total_days = (upper_dd - low_dd) -1 
+
+    no_leap_years = 0 
+    low_yy = low_yy + 1
+    diff_years = upper_yy - low_yy
+
+    if diff_years > 0:
+
+        start_year = low_yy
+        while start_year < upper_yy:
+
+            if is_leap_year(start_year):
+
+                no_leap_years += 1
+            
+            start_year += 1
+   
+        if no_leap_years > 0:
+
+            non_leap_years = diff_years - no_leap_years
+
+            total_non_leap_years = non_leap_years * 365
+            total_leap_years = no_leap_years * 366
+
+            total_days = total_days + total_leap_years + total_non_leap_years
+        
+        else:
+
+            total_days = total_days + (diff_years * 365)
+
+    date1 = '{:02d}/{:02d}/{}'.format(low_dd, low_mm if low_mm else month_equal, low_yy if low_yy else year_equal)
+    date2 = '{:02d}/{:02d}/{}'.format(upper_dd, upper_mm if upper_mm else month_equal, upper_yy if upper_yy else year_equal)
+    print('\n')
+    print('Total days between {} and {}: {} Days'.format(date1, date2, total_days))
+
+if __name__ == '__main__':
+    main()
