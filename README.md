@@ -6,7 +6,7 @@ To run the program, python 2.7 and above must be installed
 
 1. Run the program
 
-    ./date
+    `./date`
 
 2. Enter the first date, then press enter.
 4. Enter the second date, the press enter.
