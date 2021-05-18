@@ -4,7 +4,7 @@ The code is designed to give you the total number of days between two dates. The
 
 To run the program, python 2.7 and above must be installed
 
-1. Run the program
+1. Run the program, run the follong command
 
     `./date`
 
